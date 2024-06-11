@@ -12,13 +12,19 @@ docker compose up
 
 docker exec -it redis-rdi-postgresql-rdi-1 /bin/bash
 ./install.sh
-# you can declare "redis" and "6379" with default user and no password, no TLS for RDI Redis database
+# ... interactive installation
+# you can setup hostname "redis" and port "6379"
+# with default user and no password, no TLS
+# for RDI Redis database
+# (using Redis Stack for now - wip)
 ```
 
 # TODO
 - silent instal
 - combine with RE in docker compose
 - add demo scenario
+- assess if Redis Stack is best/needed/workable for demo
+
 
 # Installation log example
 
