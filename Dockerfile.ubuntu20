@@ -1,0 +1,32 @@
+FROM ubuntu:20.04
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  systemd systemd-sysv dbus dbus-user-session
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# RDI - timezone (prereq to systemd)
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ "UTC"
+RUN apt update
+RUN apt install -y tzdata
+RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+
+RUN apt install -y curl
+  
+# RDI installation
+RUN mkdir /rdi
+WORKDIR  /rdi
+ENV RDI_VERSION 1.0.2
+RUN curl https://redis-enterprise-software-downloads.s3.amazonaws.com/redis-di/rdi-installation-$RDI_VERSION.tar.gz -O
+RUN tar -xvf rdi-installation-$RDI_VERSION.tar.gz
+WORKDIR /rdi/rdi_install/$RDI_VERSION
+
+# those must exist for systemd daemon pidfile etc.
+#VOLUME ["/sys/fs/cgroup", "/tmp", "/run", "/var/lib/rancher"]
+VOLUME ["/tmp", "/run", "/var/lib/rancher"]
+
+# required for systemd launch which is a prerequisite for K3S
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh", "journalctl", "-f"]

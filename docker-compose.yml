@@ -1,0 +1,33 @@
+services:
+
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    networks:
+      - rdi-network
+
+  rdi:
+    build:
+      context: ./
+      # TODO - the Ubuntu20 image works standalone but not with compose
+      dockerfile: Dockerfile.ubi9
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    privileged: true
+#    tmpfs:
+#      - /tmp
+#      - /run
+#      - /sys/fs/cgroup
+#    cap_add:
+#      - ALL
+    networks:
+      - rdi-network
+    depends_on:
+      - redis
+
+networks:
+  rdi-network:
+    driver: bridge

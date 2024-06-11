@@ -1,0 +1,18 @@
+FROM redhat/ubi9-init
+
+RUN yum -y install iputils bind-utils hostname
+
+# RDI
+RUN mkdir /rdi
+WORKDIR  /rdi
+ENV RDI_VERSION 1.0.2
+RUN curl https://redis-enterprise-software-downloads.s3.amazonaws.com/redis-di/rdi-installation-$RDI_VERSION.tar.gz -O
+RUN tar -xvf rdi-installation-$RDI_VERSION.tar.gz
+WORKDIR /rdi/rdi_install/$RDI_VERSION
+
+# those must exist for systemd daemon pidfile etc.
+# /var/lib/rancher needs to be ext4 and not overlay filesystem for K3S containerd to start properly when nested in docker
+VOLUME ["/tmp", "/run", "/var/lib/rancher"]
+
+# not needed with ubi9-init
+#ENTRYPOINT ["systemd"]
